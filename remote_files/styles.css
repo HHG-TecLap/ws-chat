@@ -1,0 +1,184 @@
+body{
+    font-family: initial; /* TODO: Find a good font style */
+}
+
+#overlay_container{
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+}
+#overlay{
+    position: absolute;
+    top:50%;
+    left:50%;
+    transform: translate(-50%,-50%);
+    color:white;
+}
+#overlay h1{
+    font-size:36pt;
+}
+#overlay input{
+    width:90%;
+    height:20%;
+    font-size:24pt;
+    padding-left:2%;
+
+    border-radius:10px;
+    background-color: rgb(57, 95, 167);
+    border-color:rgb(10, 23, 48);
+    
+    color:white;
+}
+#overlay button{
+    margin-top:5%;
+    font-size:24pt;
+    
+    background-color: rgb(57, 95, 167);
+    
+    border-radius:10px;
+    border-color:rgb(10, 23, 48);
+}
+#uname_duplicate{
+    color:red;
+    margin:0;
+}
+
+#side_menu{
+    position:absolute;
+    display: block;
+    left: 0;
+    top: 0;
+    width: 20%;
+    height: 100%;
+    
+    background-color: rgb(100, 149, 237);
+    
+    border-right:2px lightgray inset;
+
+    z-index: 2;
+}
+.listing{
+    height:50%;
+    width:100%;
+    font-size:18pt;
+}
+
+#channel_list_container{
+    position:absolute;
+    top:0;
+    left:0;
+    border-bottom:2px solid lightgray;
+}
+#channel_list{
+    padding-left:5%;
+}
+
+#user_list_container{
+    position:absolute;
+    top:50%;
+    left:0;
+    border-top: 2px solid lightgray;
+}
+#user_list{
+    padding-left:5%;
+}
+
+li{
+    list-style: none;
+    width:95%;
+    border:2px solid rgb(37, 65, 117);
+    border-radius:10px;
+    padding-left:1%;
+    margin-bottom:2%;
+    background-color: rgb(81, 128, 215);
+}
+
+
+#chat_area{
+    position: absolute;
+    display: block;
+    left: 20%;
+    top: 0;
+    width: 80%;
+    height: 100%;
+
+    background-color: rgb(64, 97, 158);
+
+    z-index:1;
+}
+
+#current_channel{
+    display: block;
+    width:100%;
+    height:8%;
+
+    background-color:rgb(100, 149, 237);
+}
+#channel_name{
+    /* Grabbed from https://www.w3docs.com/snippets/css/how-to-vertically-align-a-text-within-an-html-span-tag.html */
+    height: 100%;
+    padding: 0 10px;
+    white-space: normal;
+    display: flex;
+    align-items: center;
+    /* ------- */
+
+    margin-left:5%;
+    font-size:20pt;
+    color:rgb(28, 11, 119);
+}
+
+#chat{
+    margin-left:3%;
+}
+.chat_message{
+    padding-bottom:1.5%;
+}
+.chat_meta{
+    padding-bottom:0.1%;
+    color:rgb(223, 223, 223);
+    font-size:20pt;
+}
+.chat_content{
+    padding-left:1%;
+    font-size:18pt;
+    color:rgb(243, 243, 243);
+}
+.join_leave_message{
+    font-style: italic;
+    color:rgb(198, 198, 198);
+    font-size:19pt;
+}
+
+#message_field{
+    position:absolute;
+    left:0%;
+    bottom:1%;
+    height:10%;
+    width:100%;
+}
+#message_field form{
+    height:100%;
+    width:100%;
+    margin:0;
+}
+#message_field textarea{
+    position: absolute;
+    bottom:0%;
+    left:1%;
+    width:96%;
+    height:100%;
+
+    font-size:18pt;
+
+    background-color: rgb(46, 66, 103);
+    color:white;
+    border: 2px lightgray inset;
+    border-radius:5px;
+
+    resize: none;
+}
