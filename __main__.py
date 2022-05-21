@@ -4,6 +4,7 @@ from protocol import *
 from configparser import ConfigParser
 import json, asyncio
 
+config : ConfigParser = ...
 CHANNELS : list[tuple[int,str]] = []
 CHANNEL_HISTORY : dict[int,list[MessageInfo]] = {}
 CONNECTIONS : dict[web.WebSocketResponse,tuple[int,str,dict[int,bool]]] = {}
@@ -149,7 +150,7 @@ async def ws_handler(ws : web.WebSocketResponse):
         pass
 
     CONNECTIONS.pop(ws)
-    if user_id is not ellipsis:
+    if user_id is not ...:
         await send_all(leave_message(None,user_id))
         pass
     pass
@@ -165,7 +166,13 @@ async def websocket_request(request : web.BaseRequest):
     return ws_resp
     pass
 
+@routes.get("/")
+async def main_page(request):
+    raise web.HTTPFound("/index.html")
+    pass
+
 def main():
+    global config
     config = ConfigParser()
     config.read("config.cfg")
 
