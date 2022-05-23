@@ -1,14 +1,26 @@
+var get_luid, register_name, request_channel_list, request_user_list, message, set_channel_subscription, heartbeat, message_history, SERVER_MESSAGE_TYPES;
+
 var __next_luid__ = 0;
 
-const get_luid = () => {
-    luid = __next_luid__;
+get_luid = () => {
+    let luid = __next_luid__;
+    __next_luid__++;
     return luid;
 }
 
 
 // Client messages
 
-const request_channel_list = () => {
+register_name = name => {
+    let luid = get_luid();
+    return [{
+        type: "JOIN_REGISTER",
+        request_id: luid,
+        name: name
+    }, luid];
+}
+
+request_channel_list = () => {
     let luid = get_luid();
     return [{
         request_id: luid,
@@ -16,7 +28,7 @@ const request_channel_list = () => {
     }, luid];
 };
 
-const request_user_list = () => {
+request_user_list = () => {
     let luid = get_luid();
     return [{
         request_id: luid,
@@ -24,7 +36,7 @@ const request_user_list = () => {
     }, luid];
 };
 
-const message = (channel_id, content) => {
+message = (channel_id, content) => {
     let luid = get_luid();
     return [{
         request_id: luid,
@@ -36,7 +48,7 @@ const message = (channel_id, content) => {
     }, luid];
 };
 
-const set_channel_subscription = (channel_id, state) => {
+set_channel_subscription = (channel_id, state) => {
     let luid = get_luid();
     return [{
         request_id: luid,
@@ -46,7 +58,7 @@ const set_channel_subscription = (channel_id, state) => {
     }, luid];
 };
 
-const heartbeat = code => {
+heartbeat = code => {
     let luid = get_luid();
     return [{
         request_id: luid,
@@ -55,17 +67,18 @@ const heartbeat = code => {
     }, luid];
 };
 
-const message_history = channel => {
+message_history = channel => {
     let luid = get_luid();
     return [{
         type: "HISTORY_REQ",
+        request_id: luid,
         channel: channel
     }, luid];
 }
 
 // Server messages
 
-const SERVER_MESSAGE_TYPES = [
+SERVER_MESSAGE_TYPES = [
     "ERR",
     "OK",
     "BEAT",

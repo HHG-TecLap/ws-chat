@@ -42,7 +42,8 @@ body{
     border-radius:10px;
     border-color:rgb(10, 23, 48);
 }
-#uname_duplicate{
+.login_error{
+    font-style:italic;
     color:red;
     margin:0;
 }
@@ -81,13 +82,13 @@ body{
     position:absolute;
     top:50%;
     left:0;
-    border-top: 2px solid lightgray;
 }
 #user_list{
     padding-left:5%;
 }
 
 li{
+    display:block;
     list-style: none;
     width:95%;
     border:2px solid rgb(37, 65, 117);
@@ -95,6 +96,10 @@ li{
     padding-left:1%;
     margin-bottom:2%;
     background-color: rgb(81, 128, 215);
+}
+li input{
+    position:absolute;
+    right:5%;
 }
 
 
@@ -128,7 +133,7 @@ li{
     /* ------- */
 
     margin-left:5%;
-    font-size:20pt;
+    font-size:36pt;
     color:rgb(28, 11, 119);
 }
 
@@ -170,7 +175,7 @@ li{
     position: absolute;
     bottom:0%;
     left:1%;
-    width:96%;
+    width:86%;
     height:100%;
 
     font-size:18pt;
@@ -181,4 +186,18 @@ li{
     border-radius:5px;
 
     resize: none;
+}
+#msg_submit{
+    display: inline-block;
+    position: absolute;
+    top:0;
+    right:1%;
+    width:10%;
+    height:100%;
+
+    border-color:lightgray;
+    background-color:rgb(23, 58, 119);
+    color:white;
+
+    font-size:36pt;
 }

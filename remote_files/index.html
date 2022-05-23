@@ -12,7 +12,8 @@
                 <h1>You are currently not logged in</h1>
                 <form id="login_form">
                     <input id="login_uname" autocomplete="name"><br>
-                    <h2 id="uname_duplicate" hidden="true"><i>The username you entered already exists</i></h2>
+                    <h2 class="login_error" id="uname_duplicate" hidden="true">The username you entered already exists</h2>
+                    <h2 class="login_error" id="connection_timed_out" hidden="true">It seems the connection timed out. Please relog</h2>
                     <button type="submit">Log In</button>
                 </form>
             </div>
@@ -21,22 +22,25 @@
         <section id="side_menu">
             <div class="listing" id="channel_list_container">
                 <ul id="channel_list">
-                    <li>Test Channel Name</li>
-                    <li>Another Test Channel Name</li>
+                    <!--<li>
+                        <span class="channel_name">Test Channel Name</span>
+                        <input type="checkbox">
+                    </li>
+                    <li><span class="channel_name">Another Test Channel Name</span><input type="checkbox"></li>-->
                 </ul>
             </div>
             <div class="listing" id="user_list_container">
                 <ul id="user_list">
-                    <li>Alice</li>
-                    <li>Bob</li>
+                    <!--<li>Alice</li>
+                    <li>Bob</li>-->
                 </ul>
             </div>
         </section>
         
         <section id="chat_area">
-            <div id="current_channel"><span id="channel_name">Test Channel Name</span></div>
+            <div id="current_channel"><span id="channel_name">There is currently no channel selected</span></div>
             <div id="chat">
-                <div class="chat_message">
+                <!--<div class="chat_message">
                     <div class="chat_meta">
                         <span class="chat_author">Alice</span>
                         <span> --- </span>
@@ -55,11 +59,12 @@
                 <div class="chat_message join_leave_message">
                     <span class="join_leave_name">Bob</span>
                     left the chat
-                </div>
+                </div>-->
             </div>
             <div id="message_field">
-                <form>
-                    <textarea id="msg_content" placeholder="Send a message here..." spellcheck="default" wrap="soft"></textarea>
+                <form id="message_form">
+                    <textarea id="msg_content" placeholder="Send a message here..." spellcheck="default" wrap="soft" disabled=""></textarea>
+                    <button type="submit" id="msg_submit" disabled="">Send</button>
                 </form>
             </div>
         </section>
