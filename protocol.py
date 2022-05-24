@@ -147,7 +147,12 @@ TYPE_STRS = {
     DeleteMessage:"MESSAGE_DELETE",
     SetChannelSubscription:"SET_CHANNEL_SUBSCRIPTION",
     MessageHistoryReq:"HISTORY_REQ",
-    MessageHistoryResp:"HISTORY_RESP"
+    MessageHistoryResp:"HISTORY_RESP",
+    AddChannel:"CHANNEL_ADD_REQ",
+    AddChannelResponse:"CHANNEL_ADD_RESP",
+    RemoveChannel:"CHANNEL_REM_REQ",
+    NewChannel:"CHANNEL_ADD_NOTIFY",
+    ChannelRemoved:"CHANNEL_REM_NOTIFY"
 }
 
 def base_message(type: str, request_id: int, **others) -> Message:
