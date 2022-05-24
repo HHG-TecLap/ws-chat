@@ -2,7 +2,7 @@ from aiohttp import web
 from fileroutes import add_file_routes
 from protocol import *
 from configparser import ConfigParser
-import json, asyncio
+import json, asyncio, atexit
 from time import time
 
 config : ConfigParser = ...
@@ -224,6 +224,15 @@ def main():
     app.add_routes(routes)
 
     web.run_app(app, host=config["net"]["IP_MASK"],port=config["net"]["PORT"])
+    pass
+
+@atexit.register
+def exit_save():
+    config.write("config.cfg",True)
+
+    with open(config["others"]["channels_loc"],"w") as file:
+        json.dump(file, [cname for cid, cname in CHANNELS])
+        pass
     pass
 
 if __name__ == "__main__":
