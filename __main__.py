@@ -3,10 +3,12 @@ from fileroutes import add_file_routes
 from protocol import *
 from configparser import ConfigParser
 import json, asyncio
+from time import time
 
-CHANNELS : list[tuple[int,str]] = []
-CHANNEL_HISTORY : dict[int,list[MessageInfo]] = {}
-CONNECTIONS : dict[web.WebSocketResponse,tuple[int,str,dict[int,bool]]] = {}
+config : ConfigParser = ...
+CHANNELS : list[tuple[str,str]] = []
+CHANNEL_HISTORY : dict[str,list[MessageInfo]] = {}
+CONNECTIONS : dict[web.WebSocketResponse,tuple[str,str,set[str]]] = {}
 
 routes = web.RouteTableDef()
 
@@ -42,7 +44,7 @@ async def ws_handler(ws : web.WebSocketResponse):
             continue
             pass
 
-        if CONNECTIONS[ws][:2] == (None,None) and content["type"] != TYPE_STRS[JoinRegister]:
+        if None in CONNECTIONS[ws] and content["type"] != TYPE_STRS[JoinRegister]:
             await ws.send_json(error_message(content["request_id"], ERRORS["NO_LOGIN"],"client not logged in but sending messages already"))
             continue
             pass
@@ -59,7 +61,7 @@ async def ws_handler(ws : web.WebSocketResponse):
                 continue
                 pass
 
-            if name in {name for _, name in CONNECTIONS.values()}:
+            if name in {name for _, name, _ in CONNECTIONS.values()}:
                 await ws.send_json(error_message(content["request_id"], ERRORS["DUPLICATE_NAME"], f"A user with name {name} not passed"))
                 continue
                 pass
@@ -105,7 +107,14 @@ async def ws_handler(ws : web.WebSocketResponse):
                 continue
                 pass
 
-            CONNECTIONS[ws][2][content["channel"]] = content["state"]
+            watched_channels = CONNECTIONS[ws][2]
+            if content["state"]:
+                watched_channels.add(content["channel"])
+                pass
+            elif content["channel"] in watched_channels:
+                watched_channels.remove(content["channel"])
+                pass
+
             await ws.send_json(ok_message(content["request_id"]))
             pass
 
@@ -129,13 +138,16 @@ async def ws_handler(ws : web.WebSocketResponse):
                 pass
 
             message_id = generate_snowflake()
+            author_id = CONNECTIONS[ws][0]
+            channel_id = content["channel"]
+            date = time()
             
             await ws.send_json(
-                confirm_message(content["request_id"],message_id)
+                confirm_message(content["request_id"],message_id,author_id,channel_id,date)
             )
             await send_many(
-                {uws for uws, (uname, uid, watched) in CONNECTIONS.items() if uws is not ws and watched.get(content["channel"],False)},
-                send_message_server(message_id,user_id,content["channel"],content["content"])
+                {uws for uws, (uname, uid, watched) in CONNECTIONS.items() if uws is not ws and content["channel"] in watched},
+                send_message_server(message_id,user_id,channel_id,date,content["content"])
             )
 
             CHANNEL_HISTORY.setdefault(content["channel"],[])
@@ -146,10 +158,24 @@ async def ws_handler(ws : web.WebSocketResponse):
                 "content":content["content"]
             })
             pass
+        
+        elif content["type"] == TYPE_STRS[MessageHistoryReq]:
+            if not has_keys(content,{"channel"}):
+                await ws.send_json(error_message(content["request_id"],ERRORS["MALFORMED_PACKET"],f"The `channel` argument was not supplied. Got {set(content.keys())}"))
+                continue
+                pass
+
+            if content["channel"] not in {cid for cid, _ in CHANNELS}:
+                await ws.send_json(error_message(content["request_id"],ERRORS["UNKNOWN_CHANNEL"],f"Channel with id {content['channel']} does not exist."))
+                continue
+                pass
+
+            await ws.send_json(message_history_resp(content["request_id"],CHANNEL_HISTORY[content["channel"]]))
+            pass
         pass
 
     CONNECTIONS.pop(ws)
-    if user_id is not ellipsis:
+    if user_id is not ...:
         await send_all(leave_message(None,user_id))
         pass
     pass
@@ -159,25 +185,35 @@ async def websocket_request(request : web.BaseRequest):
     ws_resp = web.WebSocketResponse()
     await ws_resp.prepare(request)
 
-    CONNECTIONS[ws_resp] = (None,None)
+    CONNECTIONS[ws_resp] = (None,None,set())
     await ws_handler(ws_resp)
 
     return ws_resp
     pass
 
+@routes.get("/")
+async def main_page(request):
+    raise web.HTTPFound("/index.html")
+    pass
+
 def main():
+    global config
     config = ConfigParser()
     config.read("config.cfg")
 
     # Load in channels
-    global CHANNELS
     with open(config["others"]["channels_loc"]) as file:
-        CHANNELS = json.load(file)
+        channel_names = json.load(file)
+        for cname in channel_names:
+            cid = generate_snowflake()
+            CHANNELS.append((cid,cname))
+            CHANNEL_HISTORY[cid] = []
+            pass
         pass
     ## Check for formatting
     assert isinstance(CHANNELS,list), RuntimeError(f"{config['others']['channels_loc']} does not contain JSONArray")
     for i, c in enumerate(CHANNELS):
-        assert isinstance(c,list) and len(c)==2 and isinstance(c[0],int) and isinstance(c[1],str), f"Malformated channel {i}: {c}"
+        assert isinstance(c[1],str), f"Malformated channel {i}: {c}"
         pass
 
     # Auto add routes in remote_files

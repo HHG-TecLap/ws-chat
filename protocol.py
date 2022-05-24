@@ -9,15 +9,16 @@ ERRORS = {
 from typing import TypedDict
 
 class JoinInfo(TypedDict):
-    id: int
+    id: str
     name: str
     pass
 
 class MessageInfo(TypedDict):
-    id: int
-    author: int
-    channel: int
-    content: str
+    id: str
+    author: str
+    channel: str
+    content: str|None
+    date: float
     pass
 
 class Message(TypedDict):
@@ -38,45 +39,47 @@ class JoinMessage(Message):
     pass
 
 class LeaveMessage(Message):
-    user: int
+    user: str
     pass
 
 class UserListReq(Message):
     pass
 
 class UserListResp(Message):
-    users: list[tuple[int,str]]
+    users: list[tuple[str,str]]
     pass
 
 class ChannelListReq(Message):
-    channel: int
+    channel: str
     pass
 
 class ChannelListResp(Message):
-    data: list[tuple[int,str]]
+    channels: list[tuple[str,str]]
     pass
 
 class ChatMessage(Message):
-    author: int|None
+    author: str|None
     content: str
-    channel: int|None
-    id: int|None
+    channel: str|None
+    id: str|None
+    date: float|None
     pass
 
 class ChatMessageConfirm(Message):
-    id: int
+    message:MessageInfo
     pass
 
 class DeleteMessage(Message):
-    id: int
+    id: str
     pass
 
 class EditMessage(Message):
-    id: int
+    id: str
     content: str
     pass
 
 class MessageHistoryReq(Message):
+    channel: str
     pass
 
 class MessageHistoryResp(Message):
@@ -84,7 +87,7 @@ class MessageHistoryResp(Message):
     pass
 
 class SetChannelSubscription(Message):
-    channel: int|None
+    channel: str|None
     state: bool
     pass
 
@@ -99,7 +102,7 @@ class JoinRegister(Message):
     pass
 
 class JoinRegisterResp(Message):
-    id: int
+    id: str
     pass
 
 TYPE_STRS = {
@@ -120,7 +123,7 @@ TYPE_STRS = {
     EditMessage:"MESSAGE_EDIT",
     DeleteMessage:"MESSAGE_DELETE",
     SetChannelSubscription:"SET_CHANNEL_SUBSCRIPTION",
-    MessageHistoryReq:"HISTORY_RESP",
+    MessageHistoryReq:"HISTORY_REQ",
     MessageHistoryResp:"HISTORY_RESP"
 }
 
@@ -151,18 +154,18 @@ def ok_message(req_id: int) -> ConfirmResp:
     }
     pass
 
-def join_message(req_id: int, user_id: int, user_name: str) -> JoinMessage:
+def join_message(req_id: int, user_id: str, user_name: str) -> JoinMessage:
     return {
         "type":TYPE_STRS[JoinMessage],
         "request_id":req_id,
         "data":{
             "id":user_id,
-            "user_name":user_name
+            "name":user_name
         }
     }
     pass
 
-def leave_message(req_id: int, user_id: int) -> LeaveMessage:
+def leave_message(req_id: int, user_id: str) -> LeaveMessage:
     return {
         "type":TYPE_STRS[LeaveMessage],
         "request_id":req_id,
@@ -170,7 +173,7 @@ def leave_message(req_id: int, user_id: int) -> LeaveMessage:
     }
     pass
 
-def user_list_resp(req_id: int, users : list[tuple[int,str]]) -> UserListResp:
+def user_list_resp(req_id: int, users : list[tuple[str,str]]) -> UserListResp:
     return {
         "type":TYPE_STRS[UserListResp],
         "request_id":req_id,
@@ -178,30 +181,37 @@ def user_list_resp(req_id: int, users : list[tuple[int,str]]) -> UserListResp:
     }
     pass
 
-def channel_list_resp(req_id: int, channels : list[tuple[int,str]]) -> ChannelListResp:
+def channel_list_resp(req_id: int, channels : list[tuple[str,str]]) -> ChannelListResp:
     return {
         "type":TYPE_STRS[ChannelListResp],
         "request_id":req_id,
-        "data":channels
+        "channels":channels
     }
     pass
 
-def send_message_server(message_id: int, author_id: int, channel_id: int, content: str) -> ChatMessage:
+def send_message_server(message_id: str, author_id: str, channel_id: str, date: float, content: str) -> ChatMessage:
     return {
         "type":TYPE_STRS[ChatMessage],
         "request_id":None,
         "channel":channel_id,
         "content":content,
         "author":author_id,
-        "id":message_id
+        "id":message_id,
+        "date":date,
     }
     pass
 
-def confirm_message(req_id: int, message_id: int) -> ChatMessageConfirm:
+def confirm_message(req_id: int, message_id: str, author_id: str, channel_id: str, date: float) -> ChatMessageConfirm:
     return {
         "type":TYPE_STRS[ChatMessageConfirm],
         "request_id":req_id,
-        "id":message_id
+        "message":{
+            "id":message_id,
+            "author":author_id,
+            "channel":channel_id,
+            "date":date,
+            "content":None,
+        }
     }
     pass
 
@@ -214,7 +224,9 @@ def heartbeat_ack(req_id: int) -> HeartbeatAck:
 
 def message_history_resp(req_id: int, messages: list[MessageInfo]) -> MessageHistoryResp:
     return {
-        "type":TYPE_STRS[MessageHistoryResp]
+        "type":TYPE_STRS[MessageHistoryResp],
+        "request_id":req_id,
+        "messages":messages
     }
     pass
 
@@ -265,7 +277,7 @@ def get_luid() -> int:
     pass
 
 __snowflake_inc__ = 0
-def generate_snowflake() -> int:
+def generate_snowflake() -> str:
     global __snowflake_inc__
     
     epoch_millis = time_ns()//1000
@@ -274,5 +286,5 @@ def generate_snowflake() -> int:
 
     __snowflake_inc__ = (__snowflake_inc__+1)%256
 
-    return snowflake
+    return str(snowflake)
     pass
