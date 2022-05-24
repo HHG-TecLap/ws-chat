@@ -31,10 +31,12 @@ function add_message(message_info){
 
     let author_span = document.createElement("span");
     author_span.className = "chat_author";
-    author_span.innerText = USERS[message_info.author];
+    let author_name = USERS[message_info.author];
+    if (author_name == undefined) author_name = "Unknown Author";
+    author_span.innerText = author_name;
 
     let seperator_span = document.createElement("span");
-    seperator_span.innerText = " --- ";
+    seperator_span.innerHTML = " <b>---</b> ";
 
     let time_span = document.createElement("span");
     time_span.className = "chat_time";
