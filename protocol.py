@@ -105,6 +105,27 @@ class JoinRegisterResp(Message):
     id: str
     pass
 
+class AddChannel(Message):
+    name: str
+    pass
+
+class AddChannelResponse(Message):
+    id: str
+    pass
+
+class RemoveChannel(Message):
+    id: str
+    pass
+
+class NewChannel(Message):
+    id: str
+    name: str
+    pass
+
+class ChannelRemoved(Message):
+    id: str
+    pass
+
 TYPE_STRS = {
     ConfirmResp:"OK",
     ErrorResp:"ERR",
@@ -227,6 +248,31 @@ def message_history_resp(req_id: int, messages: list[MessageInfo]) -> MessageHis
         "type":TYPE_STRS[MessageHistoryResp],
         "request_id":req_id,
         "messages":messages
+    }
+    pass
+
+def add_channel_resp(req_id: int, channel_id: str) -> AddChannelResponse:
+    return {
+        "type":TYPE_STRS[AddChannelResponse],
+        "request_id":req_id,
+        "id":channel_id
+    }
+    pass
+
+def add_channel_notify(channel_id: str, channel_name: str) -> NewChannel:
+    return {
+        "type":TYPE_STRS[NewChannel],
+        "request_id":None,
+        "id":channel_id,
+        "name":channel_name
+    }
+    pass
+
+def rem_channel_notify(channel_id: str) -> ChannelRemoved:
+    return {
+        "type":TYPE_STRS[NewChannel],
+        "request_id":None,
+        "id":channel_id
     }
     pass
 
