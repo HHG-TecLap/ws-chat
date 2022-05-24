@@ -119,7 +119,6 @@ async def ws_handler(ws : web.WebSocketResponse):
             pass
 
         elif content["type"] == TYPE_STRS[ChatMessage]:
-            content : ChatMessage
             if not has_keys(content,{"author","channel","content","id"}):
                 await ws.send_json(error_message(
                     content["request_id"],
@@ -171,6 +170,45 @@ async def ws_handler(ws : web.WebSocketResponse):
                 pass
 
             await ws.send_json(message_history_resp(content["request_id"],CHANNEL_HISTORY[content["channel"]]))
+            pass
+        
+        elif content["type"] == TYPE_STRS[AddChannel]:
+            if "name" not in content.keys():
+                await ws.send_json(error_message(content["request_id"],ERRORS["MALFORMED_PACKET"],f"Malformed packet. Key `name` not included. Got keys {set(content.keys())}"))
+                continue
+                pass
+
+            if content["name"] in {cname for cid, cname in CHANNELS}:
+                await ws.send_json(error_message(content["request_id"],ERRORS["DUPLICATE_CHANNEL"],f"A channel of name {content['name']} already exists"))
+                continue
+                pass
+
+            cid = generate_snowflake()
+            CHANNELS.append((cid,content["name"]))
+            
+            await ws.send_json(add_channel_resp(content["request_id"],cid))
+            await send_all_but(ws,add_channel_notify(cid,content["name"]))
+            pass
+
+        elif content["type"] == TYPE_STRS[RemoveChannel]:
+            if "id" not in content.keys():
+                await ws.send_json(error_message(content["request_id"],ERRORS["MALFORMED_PACKET"],f"Key `id` not passed. Got keys {set(content.keys())}"))
+                continue
+                pass
+
+            if content["id"] not in {cid for cid, cname in CHANNELS}:
+                await ws.send_json(error_message(content["request_id"],ERRORS["UNKNOWN_CHANNEL"],f"Channel of id {content['id']} not found"))
+                continue
+                pass
+
+            for cdata in CHANNELS:
+                if cdata[0] == content["id"]: break
+                pass
+
+            CHANNELS.remove(cdata)
+
+            await ws.send_json(ok_message(content["request_id"]))
+            await send_all_but(ws,rem_channel_notify(content["id"]))
             pass
         pass
 
