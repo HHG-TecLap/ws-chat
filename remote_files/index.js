@@ -9,7 +9,7 @@ const ERRORS = {
 };
 
 const ws_constructor = () => {
-    return new WebSocket("ws://"+location.host+"/ws");
+    return new WebSocket(`ws://${location.host}/ws`);
 }
 
 var ws = ws_constructor();
@@ -19,7 +19,7 @@ var USERS = {};
 var CHANNELS = [];
 var CHANNEL_HISTORY = {};
 
-function add_message(message_info){
+function add_message(message_info) {
     let chat_container = document.getElementById("chat");
 
     let message_container = document.createElement("div");
@@ -56,7 +56,7 @@ function add_message(message_info){
     chat_container.appendChild(message_container);
 }
 
-function find_channel_name(id){
+function find_channel_name(id) {
     let name;
     CHANNELS.forEach(([cid, cname]) => {
         if (name != undefined) return;
@@ -67,7 +67,7 @@ function find_channel_name(id){
     return name;
 }
 
-function switch_channel(id){
+function switch_channel(id) {
     return event => {
         if(current_channel_id == undefined){
             let textarea = document.getElementById("msg_content");
@@ -96,7 +96,7 @@ function switch_channel(id){
                     response = await send_and_wait(packet,luid);
                 } catch(response){
                     if (response.code == 0b00000000000000000000000000100000){
-                        console.error("The channel with the id "+id+" does not exist. This should not occur");
+                        console.error(`The channel with the id ${id} does not exist. This should not occur`);
                         return;
                     }
                 }
@@ -113,7 +113,7 @@ function switch_channel(id){
         channel_name.innerText = cname;
     }
 }
-function set_subscription_event(id){
+function set_subscription_event(id) {
     return async function(event){
         event.preventDefault();
 
@@ -134,7 +134,7 @@ function set_subscription_event(id){
             await send_and_wait(packet, luid);
         } catch (response){
             if (response.code == 0b00000000000000000000000000100000){
-                console.error("Set Channel subscription returned unknown channel error. ID "+id);
+                console.error(`Set Channel subscription returned unknown channel error. ID ${id}`);
             } else{
                 console.error("Unexpected error message for set channel subscription");
                 console.dir(response);
@@ -152,11 +152,11 @@ function set_subscription_event(id){
     };
 }
 
-function remove_children(obj){
+function remove_children(obj) {
     while(obj.lastChild != null) obj.removeChild(obj.lastChild);
 }
 
-function send_and_wait(packet, luid){
+function send_and_wait(packet, luid) {
     let promise = new Promise((resolve, reject) => {
         let listener = event => {
             let response = JSON.parse(event.data);
@@ -173,7 +173,7 @@ function send_and_wait(packet, luid){
     return promise;
 }
 
-function single_beat(){
+function single_beat() {
     let [packet, luid] = heartbeat();
 
     let promise = new Promise((resolve, reject) => {
@@ -197,7 +197,7 @@ function single_beat(){
     return promise;
 }
 
-function create_list_item(name){
+function create_list_item(name) {
     let item = document.createElement("li");
     item.innerText = name;
     return item;
@@ -220,13 +220,13 @@ function create_channel_item(id, name){
 
     return list_item;
 }
-function create_user_item(id, name){
+function create_user_item(id, name) {
     let item = create_list_item(name);
     item.dataset["uid"] = id;
     return item;
 }
 
-async function update_user_list(){
+async function update_user_list() {
     let [packet, luid] = request_user_list();
     let response;
     try{
@@ -238,7 +238,7 @@ async function update_user_list(){
     }
     
     if (response.type!="USER_LIST_RESP"){
-        console.error("Unexpected response whilst updating user list. Got type "+response.type);
+        console.error(`Unexpected response whilst updating user list. Got type ${response.type}`);
         return;
     }
 
@@ -252,7 +252,7 @@ async function update_user_list(){
     });
 }
 
-async function update_channel_list(){
+async function update_channel_list() {
     let [packet, luid] = request_channel_list();
     let response;
     try{
@@ -264,7 +264,7 @@ async function update_channel_list(){
     }
 
     if (response.type!="CHANNEL_LIST_RESP"){
-        console.error("Unexpected response whilst updating the channel list. Got type "+response.type);
+        console.error(`Unexpected response whilst updating the channel list. Got type ${response.type}`);
         return;
     }
 
@@ -351,7 +351,7 @@ const on_login = () => {
                 console.error("Unexpected error message from send message");
                 console.dir(response);
             } else{
-                console.error("Unknown channel for send message. Current channel id "+current_channel_id);
+                console.error(`Unknown channel for send message. Current channel id ${current_channel_id}`);
             }
             return;
         }
@@ -398,7 +398,7 @@ window.addEventListener("load", () =>{
         let [packet, luid] = register_name(name_input.value);
         send_and_wait(packet,luid).then(response => {
             if(response.type != "USER_JOIN"){
-                console.error("Register got unexpected response type. Got "+response.type);
+                console.error(`Register got unexpected response type. Got ${response.type}`);
                 return;
             }
             user_id = response.data.id;
