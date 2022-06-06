@@ -133,7 +133,7 @@ li input{
     /* ------- */
 
     margin-left:5%;
-    font-size:36pt;
+    font-size:6vh;
     color:rgb(28, 11, 119);
 }
 
@@ -171,7 +171,7 @@ li input{
     width:100%;
     margin:0;
 }
-#message_field textarea{
+#message_field input{
     position: absolute;
     bottom:0%;
     left:1%;
@@ -198,6 +198,6 @@ li input{
     border-color:lightgray;
     background-color:rgb(23, 58, 119);
     color:white;
-
-    font-size:36pt;
+    font-size: 3vw;
+    text-align:left;
 }
