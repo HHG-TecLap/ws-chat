@@ -361,6 +361,7 @@ const on_login = () => {
         response.message.content = content;
 
         add_message(response.message);
+        message_input.value = '';
     }
 
     update_user_list();
