@@ -109,6 +109,7 @@ class JoinRegisterResp(Message):
 
 class AddChannel(Message):
     name: str
+    pswd: Optional[str]
     pass
 
 class AddChannelResponse(Message):
@@ -117,6 +118,7 @@ class AddChannelResponse(Message):
 
 class RemoveChannel(Message):
     id: str
+    pswd: Optional[str]
     pass
 
 class NewChannel(Message):

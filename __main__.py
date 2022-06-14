@@ -4,6 +4,7 @@ from protocol import *
 from configparser import ConfigParser
 import json, asyncio, atexit
 from time import time
+from hmac import compare_digest
 
 config : ConfigParser = ...
 CHANNELS : list[tuple[str,str]] = []
@@ -173,8 +174,14 @@ async def ws_handler(ws : web.WebSocketResponse):
             pass
         
         elif content["type"] == TYPE_STRS[AddChannel]:
-            if "name" not in content.keys():
+            if not has_keys(content,{"name","pswd"}):
                 await ws.send_json(error_message(content["request_id"],ERRORS["MALFORMED_PACKET"],f"Malformed packet. Key `name` not included. Got keys {set(content.keys())}"))
+                continue
+                pass
+
+            channel_mod_pswd = config["ui"]["channel_mod_pswd"]
+            if channel_mod_pswd != "" and not compare_digest(content["pswd"],channel_mod_pswd):
+                await ws.send_json(error_message(content["request_id"],ERRORS["NO_PERMISSION"],"The password you entered is invalid."))
                 continue
                 pass
 
@@ -191,13 +198,19 @@ async def ws_handler(ws : web.WebSocketResponse):
             pass
 
         elif content["type"] == TYPE_STRS[RemoveChannel]:
-            if "id" not in content.keys():
+            if not has_keys(content,{"id","pswd"}):
                 await ws.send_json(error_message(content["request_id"],ERRORS["MALFORMED_PACKET"],f"Key `id` not passed. Got keys {set(content.keys())}"))
                 continue
                 pass
 
             if content["id"] not in {cid for cid, cname in CHANNELS}:
                 await ws.send_json(error_message(content["request_id"],ERRORS["UNKNOWN_CHANNEL"],f"Channel of id {content['id']} not found"))
+                continue
+                pass
+
+            channel_mod_pswd = config["ui"]["channel_mod_pswd"]
+            if channel_mod_pswd != "" and not compare_digest(content["pswd"],channel_mod_pswd):
+                await ws.send_json(error_message(content["request_id"],ERRORS["NO_PERMISSION"],"The password you entered is invalid."))
                 continue
                 pass
 
