@@ -8,7 +8,7 @@ ERRORS = {
     "DUPLICATE_CHANNEL":0b00000000000000000000000000100001,
 }
 
-from typing import TypedDict
+from typing import TypedDict, Optional
 
 class JoinInfo(TypedDict):
     id: str
@@ -19,7 +19,7 @@ class MessageInfo(TypedDict):
     id: str
     author: str
     channel: str
-    content: str|None
+    content: Optional[str]
     date: float
     pass
 
@@ -60,11 +60,11 @@ class ChannelListResp(Message):
     pass
 
 class ChatMessage(Message):
-    author: str|None
+    author: Optional[str]
     content: str
-    channel: str|None
-    id: str|None
-    date: float|None
+    channel: Optional[str]
+    id: Optional[str]
+    date: Optional[str]
     pass
 
 class ChatMessageConfirm(Message):
@@ -89,7 +89,7 @@ class MessageHistoryResp(Message):
     pass
 
 class SetChannelSubscription(Message):
-    channel: str|None
+    channel: Optional[str]
     state: bool
     pass
 
