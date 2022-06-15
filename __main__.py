@@ -266,10 +266,12 @@ def main():
 
 @atexit.register
 def exit_save():
-    config.write("config.cfg",True)
+    with open("config.cfg","w") as file:
+        config.write(file,True)
+        pass
 
     with open(config["others"]["channels_loc"],"w") as file:
-        json.dump(file, [cname for cid, cname in CHANNELS])
+        json.dump([cname for cid, cname in CHANNELS],file)
         pass
     pass
 
