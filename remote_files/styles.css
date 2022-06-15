@@ -139,7 +139,7 @@ li input{
 
 #chat{
     margin-left:3%;
-    height:82%;
+    height:80%;
     overflow-y:scroll;
 }
 .chat_message{
