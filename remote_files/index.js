@@ -69,6 +69,11 @@ function find_channel_name(id) {
     return name;
 }
 
+function change_messages(messages){
+    remove_children(document.getElementById("chat"));
+    messages.forEach(add_message);
+}
+
 function switch_channel(id) {
     return event => {
         if(current_channel_id == undefined){
@@ -102,12 +107,14 @@ function switch_channel(id) {
                         return;
                     }
                 }
-
-                remove_children(document.getElementById("chat"));
-                response.messages.forEach(add_message);
+                CHANNEL_HISTORY[id] = response.messages;
+                change_messages(response.messages);
             };
             f();
-        }
+        } else{
+        console.dir(CHANNEL_HISTORY[id]);
+        change_messages(CHANNEL_HISTORY[id]);
+	}
 
         let cname = find_channel_name(id);
         
@@ -361,6 +368,7 @@ const on_login = () => {
         response.message.content = content;
 
         add_message(response.message);
+        CHANNEL_HISTORY[current_channel_id].push(response.message);
         message_input.value = '';
     }
 
