@@ -16,7 +16,6 @@ const ws_constructor = () => {
 
 var ws = ws_constructor();
 var user_name, user_id, current_channel_id;
-var user_id;
 var USERS = {};
 var CHANNELS = [];
 var CHANNEL_HISTORY = {};
@@ -341,7 +340,10 @@ const on_login = () => {
                     date:data.date
                 }
                 CHANNEL_HISTORY[data.channel].push(message_data);
-                add_message(message_data);
+                if (data.channel === current_channel_id){
+                    add_message(message_data);
+                }
+                
                 break;
         }
     });
