@@ -66,7 +66,7 @@ class ChatMessage(Message):
     content: str
     channel: Optional[str]
     id: Optional[str]
-    date: Optional[str]
+    date: Optional[int]
     pass
 
 class ChatMessageConfirm(Message):

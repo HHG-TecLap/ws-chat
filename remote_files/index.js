@@ -20,7 +20,14 @@ var USERS = {};
 var CHANNELS = [];
 var CHANNEL_HISTORY = {};
 
+function parse_date(date){
+    // This function may be extended to be more complex in the future
+    return date.toLocaleString(navigator.language);
+}
+
 function add_message(message_info) {
+    let date = new Date(message_info.date*1000);
+
     let chat_container = document.getElementById("chat");
 
     let message_container = document.createElement("div");
@@ -41,7 +48,7 @@ function add_message(message_info) {
 
     let time_span = document.createElement("span");
     time_span.className = "chat_time";
-    time_span.innerText = "TODO: Add a time here";
+    time_span.innerText = parse_date(date);
 
     message_meta.appendChild(author_span);
     message_meta.appendChild(seperator_span);
@@ -343,7 +350,7 @@ const on_login = () => {
                 if (data.channel === current_channel_id){
                     add_message(message_data);
                 }
-                
+
                 break;
         }
     });
