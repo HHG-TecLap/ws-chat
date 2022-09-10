@@ -123,6 +123,7 @@ async def ws_handler(ws : web.WebSocketResponse):
             pass
 
         elif content["type"] == TYPE_STRS[ChatMessage]:
+            # Check for missing keys
             if not has_keys(content,{"author","channel","content","id"}):
                 await ws.send_json(error_message(
                     content["request_id"],
@@ -131,6 +132,7 @@ async def ws_handler(ws : web.WebSocketResponse):
                 ))
                 continue
                 pass
+            # Check for non-existent channels
             if content["channel"] not in {c[0] for c in CHANNELS}:
                 await ws.send_json(error_message(
                     content["request_id"],
@@ -139,12 +141,19 @@ async def ws_handler(ws : web.WebSocketResponse):
                 ))
                 continue
                 pass
+            # Check for empty messages
+            if not validate_message(content["content"]):
+                await ws.send_json(
+                    error_message(content["request_id"],ERRORS["EMPTY_MESSAGE"],"The sent message is empty")
+                )
+                return
 
             message_id = generate_snowflake()
             author_id = CONNECTIONS[ws][0]
             channel_id = content["channel"]
             date = time()
             
+            # Send message
             await ws.send_json(
                 confirm_message(content["request_id"],message_id,author_id,channel_id,date)
             )
@@ -153,6 +162,7 @@ async def ws_handler(ws : web.WebSocketResponse):
                 send_message_server(message_id,user_id,channel_id,date,content["content"])
             )
 
+            # Add message to channel history
             CHANNEL_HISTORY.setdefault(content["channel"],[])
             CHANNEL_HISTORY[content["channel"]].append({
                 "id":message_id,

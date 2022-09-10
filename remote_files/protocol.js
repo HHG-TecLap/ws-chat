@@ -1,4 +1,4 @@
-var get_luid, register_name, request_channel_list, request_user_list, message, set_channel_subscription, heartbeat, message_history, SERVER_MESSAGE_TYPES, make_valid_name;
+var get_luid, register_name, request_channel_list, request_user_list, message, set_channel_subscription, heartbeat, message_history, SERVER_MESSAGE_TYPES, make_valid_name, validate_message;
 
 var __next_luid__ = 0;
 
@@ -16,6 +16,10 @@ make_valid_name = name => {
 
     return new_name.length != 0 ? new_name : null;
 };
+
+validate_message = message => {
+    return message.trim().length != 0;
+}
 
 
 // Client messages

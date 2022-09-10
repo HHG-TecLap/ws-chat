@@ -7,6 +7,7 @@ ERRORS = {
     "INVALID_NAME":     0b00000000000000000000000000010011,
     "UNKNOWN_CHANNEL":  0b00000000000000000000000000100000,
     "DUPLICATE_CHANNEL":0b00000000000000000000000000100001,
+    "EMPTY_MESSAGE":    0b00000000000000000000000001000000,
 }
 
 from typing import TypedDict, Optional
@@ -354,4 +355,8 @@ def make_valid_username(name: str) -> Optional[str]:
     if len(name) == 0: 
         return None
     return name
+    pass
+
+def validate_message(message: str) -> bool:
+    return len(message.strip()) != 0
     pass

@@ -1,12 +1,13 @@
 const HEARTBEAT_INTERVAL = 1000*60;
 const HEARTBEAT_TIMEOUT  = 1000*10;
 const ERRORS = {
-    "MALFORMED_PACKET":0b00000000000000000000000000000000,
-    "NO_LOGIN":0b00000000000000000000000000010000,
-    "DUPLICATE_NAME":0b00000000000000000000000000010001,
-    "DUPLICATE_LOGIN":0b00000000000000000000000000010010,
+    "MALFORMED_PACKET": 0b00000000000000000000000000000000,
+    "NO_LOGIN":         0b00000000000000000000000000010000,
+    "DUPLICATE_NAME":   0b00000000000000000000000000010001,
+    "DUPLICATE_LOGIN":  0b00000000000000000000000000010010,
     "INVALID_NAME":     0b00000000000000000000000000010011,
-    "UNKNOWN_CHANNEL":0b00000000000000000000000000100000,
+    "UNKNOWN_CHANNEL":  0b00000000000000000000000000100000,
+    "EMPTY_MESSAGE":    0b00000000000000000000000001000000,
 };
 
 const ws_constructor = () => {
@@ -351,17 +352,20 @@ const on_login = () => {
         event.preventDefault();
         
         let content = message_input.value;
+        if (!validate_message(content)) return; // Don't send empty messages
 
         let [packet, luid] = message(current_channel_id,content);
         let response;
         try{
             response = await send_and_wait(packet,luid);
         } catch(response){
-            if (response.code != ERRORS["UNKNOWN_CHANNEL"]){
+            if (response.code === ERRORS["UNKNOWN_CHANNEL"]){
+                console.error(`Unknown channel for send message. Current channel id ${current_channel_id}`);
+            } else if (response.code === ERRORS["EMPTY_MESSAGE"]){
+                console.error("Somehow sent empty message. This should not normally occur and is most likely an error in code");
+            } else{
                 console.error("Unexpected error message from send message");
                 console.dir(response);
-            } else{
-                console.error(`Unknown channel for send message. Current channel id ${current_channel_id}`);
             }
             return;
         }
@@ -372,6 +376,10 @@ const on_login = () => {
         CHANNEL_HISTORY[current_channel_id].push(response.message);
         message_input.value = '';
     }
+    message_input.addEventListener("input", () => {
+        document.getElementById("msg_submit")
+        .disabled = !validate_message(message_input.value);
+    });
 
     update_user_list();
     update_channel_list();
@@ -446,4 +454,6 @@ window.addEventListener("load", () =>{
 
     // Emulate input event to cause initial check (helpful for autocompletes)
     name_input.dispatchEvent(new Event("input"));
+    document.getElementById("msg_content")
+    .dispatchEvent(new Event("input"));
 });
