@@ -61,6 +61,10 @@ async def ws_handler(ws : web.WebSocketResponse):
                 continue
                 pass
 
+            name = make_valid_username(name)
+            if name is None:
+                await ws.send_json(error_message(content["request_id"], ERRORS["INVALID_NAME"], f"name '{name}' is not valid"))
+
             if name in {name for _, name, _ in CONNECTIONS.values()}:
                 await ws.send_json(error_message(content["request_id"], ERRORS["DUPLICATE_NAME"], f"A user with name {name} not passed"))
                 continue

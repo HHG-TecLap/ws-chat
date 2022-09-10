@@ -5,6 +5,7 @@ const ERRORS = {
     "NO_LOGIN":0b00000000000000000000000000010000,
     "DUPLICATE_NAME":0b00000000000000000000000000010001,
     "DUPLICATE_LOGIN":0b00000000000000000000000000010010,
+    "INVALID_NAME":     0b00000000000000000000000000010011,
     "UNKNOWN_CHANNEL":0b00000000000000000000000000100000,
 };
 
@@ -395,18 +396,28 @@ const on_timeout = () => {
 }
 
 window.addEventListener("load", () =>{
-
     let login_form = document.getElementById("login_form");
+    let name_input = document.getElementById("login_uname");
+    let button = login_form.getElementsByTagName("button")[0];
+    
+    name_input.addEventListener("input", () => {
+        let valid_name = make_valid_name(name_input.value);
+        
+        // Disable button if name is invalid
+        button.disabled = valid_name === null; 
+    });
+
     login_form.onsubmit = event => {
         event.preventDefault();
         
-        let name_input = document.getElementById("login_uname");
-        let button = login_form.getElementsByTagName("button")[0];
         let error_msg = document.getElementById("uname_duplicate");
-
         button.disabled = true;
+
+        // This is technically optional since the server would do this itself
+        let name = make_valid_name(name_input.value);
+        if (name === null) return; // If null, the name is invalid, meaning we're not logging in
         
-        let [packet, luid] = register_name(name_input.value);
+        let [packet, luid] = register_name(name);
         send_and_wait(packet,luid).then(response => {
             if(response.type != "USER_JOIN"){
                 console.error(`Register got unexpected response type. Got ${response.type}`);
@@ -432,4 +443,7 @@ window.addEventListener("load", () =>{
             error_msg.hidden = false;
         });
     }
+
+    // Emulate input event to cause initial check (helpful for autocompletes)
+    name_input.dispatchEvent(new Event("input"));
 });

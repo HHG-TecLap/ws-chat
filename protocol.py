@@ -1,10 +1,11 @@
 ERRORS = {
-    "MALFORMED_PACKET":0b00000000000000000000000000000000,
-    "NO_PERMISSION":0b00000000000000000000000000000001,
-    "NO_LOGIN":0b00000000000000000000000000010000,
-    "DUPLICATE_NAME":0b00000000000000000000000000010001,
-    "DUPLICATE_LOGIN":0b00000000000000000000000000010010,
-    "UNKNOWN_CHANNEL":0b00000000000000000000000000100000,
+    "MALFORMED_PACKET": 0b00000000000000000000000000000000,
+    "NO_PERMISSION":    0b00000000000000000000000000000001,
+    "NO_LOGIN":         0b00000000000000000000000000010000,
+    "DUPLICATE_NAME":   0b00000000000000000000000000010001,
+    "DUPLICATE_LOGIN":  0b00000000000000000000000000010010,
+    "INVALID_NAME":     0b00000000000000000000000000010011,
+    "UNKNOWN_CHANNEL":  0b00000000000000000000000000100000,
     "DUPLICATE_CHANNEL":0b00000000000000000000000000100001,
 }
 
@@ -340,4 +341,17 @@ def generate_snowflake() -> str:
     __snowflake_inc__ = (__snowflake_inc__+1)%256
 
     return str(snowflake)
+    pass
+
+## Checks
+def make_valid_username(name: str) -> Optional[str]:
+    # Corrects a client entered username or returns None if the name is invalid
+    
+    # Collapse whitespace
+    name = name.strip()
+    name = " ".join(filter(lambda s: len(s) != 0, name.split(" ")))
+
+    if len(name) == 0: 
+        return None
+    return name
     pass
