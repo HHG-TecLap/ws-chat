@@ -3,7 +3,7 @@ from fileroutes import add_file_routes
 from protocol import *
 from configparser import ConfigParser
 import json, asyncio, atexit
-from time import time
+from datetime import datetime
 
 config : ConfigParser = ...
 CHANNELS : list[tuple[str,str]] = []
@@ -151,7 +151,7 @@ async def ws_handler(ws : web.WebSocketResponse):
             message_id = generate_snowflake()
             author_id = CONNECTIONS[ws][0]
             channel_id = content["channel"]
-            date = time()
+            date = datetime.utcnow().timestamp() # Done as a datetime object to be timezone aware
             
             # Send message
             await ws.send_json(
