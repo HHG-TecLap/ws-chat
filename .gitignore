@@ -4,7 +4,6 @@ __pycache__/
 
 # Venv
 venv/
-pyvenv.cfg
 
 # Private files for program
-channels.json
+/channels.json
