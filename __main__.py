@@ -88,7 +88,7 @@ async def ws_handler(ws : web.WebSocketResponse):
         elif content["type"] == TYPE_STRS[UserListReq]:
             await ws.send_json(user_list_resp(
                 content["request_id"],
-                [(uid, uname) for uid, uname, _ in CONNECTIONS.values()]
+                [(uid, uname) for uid, uname, _ in CONNECTIONS.values() if None not in (uid, uname)]
             ))
             pass
 
