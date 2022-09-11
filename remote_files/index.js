@@ -39,8 +39,7 @@ function add_message(message_info) {
 
     let author_span = document.createElement("span");
     author_span.className = "chat_author";
-    let author_name = USERS[message_info.author];
-    if (author_name == undefined) author_name = "Unknown Author";
+    let author_name = USERS[message_info.author] || message_info.username || "Unknown Author";
     author_span.innerText = author_name;
 
     let seperator_span = document.createElement("span");
