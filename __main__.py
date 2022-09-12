@@ -150,6 +150,7 @@ async def ws_handler(ws : web.WebSocketResponse):
 
             message_id = generate_snowflake()
             author_id = CONNECTIONS[ws][0]
+            author_name = CONNECTIONS[ws][1]
             channel_id = content["channel"]
             date = datetime.now(timezone.utc).timestamp() # Done as a datetime object to be timezone aware
             
@@ -165,10 +166,12 @@ async def ws_handler(ws : web.WebSocketResponse):
             # Add message to channel history
             CHANNEL_HISTORY.setdefault(content["channel"],[])
             CHANNEL_HISTORY[content["channel"]].append({
-                "id":message_id,
-                "author":user_id,
-                "channel":content["channel"],
-                "content":content["content"]
+                "id": message_id,
+                "author": user_id,
+                "channel": content["channel"],
+                "content": content["content"],
+                "username": author_name,
+                "date": date
             })
             pass
         
