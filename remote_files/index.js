@@ -39,8 +39,9 @@ function add_message(message_info) {
 
     let author_span = document.createElement("span");
     author_span.className = "chat_author";
-    let author_name = USERS[message_info.author] || message_info.username || "Unknown Author";
+    let author_name = USERS[message_info.author] || `${message_info.username}` || "Unknown Author";
     author_span.innerText = author_name;
+    if (!USERS[message_info.author]) author_span.style = "font-style: italic";
 
     let seperator_span = document.createElement("span");
     seperator_span.innerHTML = " <b>---</b> ";
