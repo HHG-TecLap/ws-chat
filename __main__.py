@@ -170,7 +170,8 @@ async def ws_handler(ws : web.WebSocketResponse):
                 "author": user_id,
                 "channel": content["channel"],
                 "content": content["content"],
-                "username": author_name
+                "username": author_name,
+                "date": date
             })
             pass
         
