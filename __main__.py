@@ -1,3 +1,4 @@
+from typing import Iterable
 from aiohttp import web
 from fileroutes import add_file_routes
 from protocol import *
@@ -14,17 +15,25 @@ routes = web.RouteTableDef()
 
 has_keys = lambda dict, keys: set(dict.keys()).issuperset(keys)
 
-async def send_many(targets : set[web.WebSocketResponse], message : Message):
+def is_valid(ws: web.WebSocketResponse):
+    return ws in CONNECTIONS[ws] and None not in CONNECTIONS[ws]
+    # If any of the user data is None, its login process has not yet finished
+    pass
+
+async def send_many(targets : Iterable[web.WebSocketResponse], message : Message):
     await asyncio.gather(*{t.send_json(message) for t in targets})
     pass
 
 async def send_all(message : Message):
-    await send_many(CONNECTIONS.keys(),message)
+    await send_many(filter(is_valid,CONNECTIONS.keys()),message)
     pass
 
 async def send_all_but(exception : web.WebSocketResponse, message : Message):
-    targets = set(CONNECTIONS.keys()).copy()
-    targets.remove(exception)
+    targets = {
+        ws for ws, data in CONNECTIONS.items()
+        if is_valid(ws) and ws is not exception
+    }
+
     await send_many(targets,message)
     pass
 
@@ -74,7 +83,11 @@ async def ws_handler(ws : web.WebSocketResponse):
             CONNECTIONS[ws] = (user_id, name, set())
 
             await ws.send_json(join_message(content["request_id"],user_id,name))
-            await send_all_but(ws,join_message(None,user_id,name))
+            try:
+                await send_all_but(ws,join_message(None,user_id,name))
+            except ConnectionResetError as e:
+                print("Hello World!")
+                raise e
             pass
         
         elif content["type"] == TYPE_STRS[Heartbeat]:
