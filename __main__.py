@@ -83,11 +83,7 @@ async def ws_handler(ws : web.WebSocketResponse):
             CONNECTIONS[ws] = (user_id, name, set())
 
             await ws.send_json(join_message(content["request_id"],user_id,name))
-            try:
-                await send_all_but(ws,join_message(None,user_id,name))
-            except ConnectionResetError as e:
-                print("Hello World!")
-                raise e
+            await send_all_but(ws,join_message(None,user_id,name))
             pass
         
         elif content["type"] == TYPE_STRS[Heartbeat]:
