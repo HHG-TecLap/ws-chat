@@ -16,7 +16,7 @@ routes = web.RouteTableDef()
 has_keys = lambda dict, keys: set(dict.keys()).issuperset(keys)
 
 def is_valid(ws: web.WebSocketResponse):
-    return ws in CONNECTIONS[ws] and None not in CONNECTIONS[ws]
+    return ws in CONNECTIONS and None not in CONNECTIONS[ws]
     # If any of the user data is None, its login process has not yet finished
     pass
 
