@@ -20,9 +20,32 @@ var USERS = {};
 var CHANNELS = [];
 var CHANNEL_HISTORY = {};
 
+/**
+ * Function to get a human-readable name
+ * @param {Date} date 
+ * @returns {string} Date String
+ */
 function parse_date(date){
-    // This function may be extended to be more complex in the future
-    return date.toLocaleString(navigator.language);
+    const currentDate = new Date();
+    if (date.getMonth() === currentDate.getMonth() && date.getDay() === currentDate.getDay() && date.getFullYear() === currentDate.getFullYear()) {
+        todayInLocaleString = '';
+        console.log(navigator.language);
+        switch (navigator.language) {
+            case 'de': // Firefox
+                todayInLocaleString = 'Heute, ';
+                break;
+
+            case 'de-DE': // Chrome
+                todayInLocaleString = 'Heute, ';
+
+            default:
+                todayInLocaleString = 'Today, ';
+                break;
+        }
+        return `${todayInLocaleString}${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
+    } else {
+        return date.toLocaleString(navigator.language);
+    }
 }
 
 function add_message(message_info) {
