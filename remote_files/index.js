@@ -26,7 +26,6 @@ var CHANNEL_HISTORY = {};
  * @returns {string} Date String
  */
 function parse_date(date){
-    // This function may be extended to be more complex in the future
     const currentDate = new Date();
     if (date.getMonth() === currentDate.getMonth() && date.getDay() === currentDate.getDay() && date.getFullYear() === currentDate.getFullYear()) {
         todayInLocaleString = '';
