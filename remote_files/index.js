@@ -64,6 +64,9 @@ function add_message(message_info) {
     message_container.appendChild(message_content);
 
     chat_container.appendChild(message_container);
+
+    // Scroll
+    message_container.scrollIntoView(false);
 }
 
 function find_channel_name(id) {
