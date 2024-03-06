@@ -1,3 +1,4 @@
+import logging
 from typing import Iterable
 from aiohttp import web
 from fileroutes import add_file_routes
@@ -237,10 +238,8 @@ async def ws_handler(ws : web.WebSocketResponse):
             await send_all_but(ws,rem_channel_notify(content["id"]))
             pass
         pass
-
-    CONNECTIONS.pop(ws)
     if user_id is not ...:
-        await send_all(leave_message(None,user_id))
+        await send_all_but(ws, leave_message(None,user_id))
         pass
     pass
 
@@ -249,8 +248,14 @@ async def websocket_request(request : web.BaseRequest):
     ws_resp = web.WebSocketResponse()
     await ws_resp.prepare(request)
 
-    CONNECTIONS[ws_resp] = (None,None,set())
-    await ws_handler(ws_resp)
+    try:
+        CONNECTIONS[ws_resp] = (None,None,set())
+        await ws_handler(ws_resp)
+    finally:
+        try:
+            CONNECTIONS.pop(ws_resp)
+        except KeyError:
+            logging.warning("Ending connection not found")
 
     return ws_resp
     pass
@@ -287,7 +292,7 @@ def main():
     app = web.Application()
     app.add_routes(routes)
 
-    web.run_app(app, host=config["net"]["IP_MASK"],port=config["net"]["PORT"])
+    web.run_app(app, host=config["net"]["IP_MASK"],port=int(config["net"]["PORT"]))
     pass
 
 @atexit.register
