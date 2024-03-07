@@ -5,7 +5,7 @@ from pathlib import Path
 
 def file_route(root: Path, path: Path) -> Route:
     relative = path.relative_to(root)
-    def endpoint():
+    def endpoint(req):
         return FileResponse(path)
     
     return Route("/" + str(relative), endpoint)
